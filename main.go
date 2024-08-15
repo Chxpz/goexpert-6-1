@@ -52,7 +52,9 @@ func main() {
 	// 	panic(error)
 	// }
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*100)
+	ctx, c := context.WithTimeout(context.Background(), time.Millisecond*100)
+
+	defer c()
 
 	p, error := selectProduct(ctx, db, "fe90af01-f557-4482-a2bd-7d3639a9199c")
 	if error != nil {
