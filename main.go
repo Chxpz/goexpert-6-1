@@ -31,10 +31,19 @@ func main() {
 
 	defer db.Close()
 
-	createTable(db)
+	// createTable(db)
 
-	product := NewProduct("1", "Product 1", 100.0)
+	product := NewProduct("_", "Product 1", 100.0)
 	error = insertProduct(db, product)
+
+	if error != nil {
+		panic(error)
+	}
+
+	product.Name = "Product 7"
+	product.Price = 301.0
+
+	error = updateProduct(db, product)
 
 	if error != nil {
 		panic(error)
@@ -73,6 +82,34 @@ func createTable(db *sql.DB) error {
 	if error != nil {
 		return error
 	}
+
+	return nil
+
+}
+
+func updateProduct(db *sql.DB, product *Product) error {
+
+	stmt, err := db.Prepare("UPDATE products SET name = ?, price = ? WHERE id = ?")
+
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	res, error := stmt.Exec(product.Name, product.Price, product.ID)
+
+	if error != nil {
+		return error
+	}
+
+	rows, err := res.LastInsertId()
+
+	if err != nil {
+		return err
+	}
+
+	println(rows)
 
 	return nil
 
